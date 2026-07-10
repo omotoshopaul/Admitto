@@ -6,6 +6,7 @@ import Signup from './pages/Signup';
 import Step1 from './pages/Step1';
 import Step2 from './pages/Step2';
 import Step3 from './pages/Step3';
+import Step4 from './pages/Step4';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -18,6 +19,7 @@ export default function App() {
         <Route path="/step1" element={<ProtectedRoute><Step1 /></ProtectedRoute>} />
         <Route path="/step2" element={<ProtectedRoute><Step2 /></ProtectedRoute>} />
         <Route path="/step3" element={<ProtectedRoute><Step3 /></ProtectedRoute>} />
+        <Route path="/step4" element={<ProtectedRoute><Step4 /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

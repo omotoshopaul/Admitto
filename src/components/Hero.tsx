@@ -1,6 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { auth } from '../lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function Hero() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <section className="pt-40 pb-16 px-6 max-w-7xl mx-auto text-center flex flex-col items-center">
       <h1 className="text-6xl md:text-8xl font-bold tracking-tight text-gray-900 mb-6">
@@ -18,9 +30,9 @@ export default function Hero() {
         <a href="#how-it-works" className="bg-brand-red hover:bg-red-500 text-white px-5 py-2 md:px-8 md:py-3 text-sm md:text-base whitespace-nowrap rounded-full font-medium transition-colors shadow-sm inline-block">
           Learn more
         </a>
-        <a href="/signup" className="bg-transparent border-2 border-brand-red text-brand-red hover:bg-red-50 px-5 py-2 md:px-8 md:py-3 text-sm md:text-base whitespace-nowrap rounded-full font-medium transition-colors">
+        <Link to={isAuthenticated ? "/step1" : "/signup"} className="bg-transparent border-2 border-brand-red text-brand-red hover:bg-red-50 px-5 py-2 md:px-8 md:py-3 text-sm md:text-base whitespace-nowrap rounded-full font-medium transition-colors">
           Get started
-        </a>
+        </Link>
       </div>
 
       <img 

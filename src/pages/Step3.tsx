@@ -54,6 +54,20 @@ export default function Step3() {
     };
   }, []);
 
+  const autoSave = async (data: any) => {
+    if (!auth.currentUser) return;
+    try {
+      await setDoc(doc(db, "users", auth.currentUser.uid), data, { merge: true });
+    } catch (error) {
+      console.error("Autosave error:", error);
+    }
+  };
+
+  const handleVerificationTypeChange = (type: 'mismatch' | 'grammar' | null) => {
+    setVerificationType(type);
+    autoSave({ verificationType: type });
+  };
+
   const triggerUpload = (type: 'mismatch' | 'grammar', index: number) => {
     if (isUploading) return;
     setActiveUploadSlot({ type, index });
@@ -69,10 +83,12 @@ export default function Step3() {
       const newDocs = [...mismatchDocuments];
       newDocs[index] = null;
       setMismatchDocuments(newDocs);
+      autoSave({ mismatchDocuments: newDocs.filter(d => d !== null) });
     } else {
       const newDocs = [...testimonialDocuments];
       newDocs[index] = null;
       setTestimonialDocuments(newDocs);
+      autoSave({ testimonialDocuments: newDocs.filter(d => d !== null) });
     }
     setUploadErrors(prev => {
       const next = { ...prev };
@@ -123,10 +139,12 @@ export default function Step3() {
           const newDocs = [...mismatchDocuments];
           newDocs[index] = data.secure_url;
           setMismatchDocuments(newDocs);
+          autoSave({ mismatchDocuments: newDocs.filter(d => d !== null) });
         } else {
           const newDocs = [...testimonialDocuments];
           newDocs[index] = data.secure_url;
           setTestimonialDocuments(newDocs);
+          autoSave({ testimonialDocuments: newDocs.filter(d => d !== null) });
         }
       } else {
         setUploadErrors(prev => ({ ...prev, [errorKey]: 'Upload failed. Please try again.' }));
@@ -150,29 +168,14 @@ export default function Step3() {
       return;
     }
 
-    if (!verificationType) {
-      setSaveError('Please select a verification type.');
-      return;
-    }
-    
-    // Validating required docs (at least one for the selected type)
-    if (!hasUploadedCurrentType) {
-      setSaveError('Please upload at least one document for your selected verification type.');
+    if (!verificationType || !hasUploadedCurrentType) {
+      setSaveError('Please select a verification type and upload at least one document.');
       return;
     }
 
     try {
-      const cleanMismatch = verificationType === 'mismatch' ? mismatchDocuments.filter(d => d !== null) : [];
-      const cleanTestimonial = verificationType === 'grammar' ? testimonialDocuments.filter(d => d !== null) : [];
-
-      await setDoc(doc(db, "users", auth.currentUser.uid), {
-        verificationType,
-        mismatchDocuments: cleanMismatch,
-        testimonialDocuments: cleanTestimonial
-      }, { merge: true });
-      
-      // Navigate to Step 4 once built. Currently disabled button shouldn't reach here easily, but just in case:
-      // navigate('/step4');
+      await autoSave({ verificationStatus: "processing" });
+      navigate('/step4');
     } catch (error) {
       console.error("Error saving data:", error);
       setSaveError('Failed to save data. Please try again.');
@@ -245,7 +248,7 @@ export default function Step3() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
           <div 
-            onClick={() => setVerificationType(verificationType === 'mismatch' ? null : 'mismatch')}
+            onClick={() => handleVerificationTypeChange(verificationType === 'mismatch' ? null : 'mismatch')}
             className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
               verificationType === 'mismatch' 
                 ? 'border-[#E24B4A] bg-red-50' 
@@ -261,7 +264,7 @@ export default function Step3() {
           </div>
 
           <div 
-            onClick={() => setVerificationType(verificationType === 'grammar' ? null : 'grammar')}
+            onClick={() => handleVerificationTypeChange(verificationType === 'grammar' ? null : 'grammar')}
             className={`p-6 rounded-xl border-2 cursor-pointer transition-all ${
               verificationType === 'grammar' 
                 ? 'border-[#E24B4A] bg-red-50' 
@@ -326,7 +329,7 @@ export default function Step3() {
           <button 
             type="button"
             onClick={() => navigate('/step2')}
-            className="flex-1 bg-[#E24B4A] hover:bg-red-500 text-white font-medium py-3.5 rounded-xl transition-colors h-[52px]"
+            className="flex-1 bg-white border border-[#E24B4A] text-[#E24B4A] hover:bg-red-50 font-medium py-3.5 rounded-xl transition-colors h-[52px]"
           >
             Back
           </button>
@@ -334,8 +337,7 @@ export default function Step3() {
           <button 
             type="button" 
             onClick={handleNext}
-            disabled={true}
-            className="flex-1 bg-white border border-[#E24B4A] text-[#E24B4A] font-medium py-3.5 rounded-xl flex justify-center items-center h-[52px] transition-colors opacity-60 cursor-not-allowed"
+            className="flex-1 bg-[#E24B4A] hover:bg-red-500 text-white font-medium py-3.5 rounded-xl flex justify-center items-center h-[52px] transition-colors"
           >
             Next
           </button>

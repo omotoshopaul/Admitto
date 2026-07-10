@@ -15,13 +15,13 @@ import {
 } from "firebase/auth";
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
-  appId: import.meta.env.VITE_FIREBASE_APP_ID,
-  measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
+  apiKey: "AIzaSyB1DQ9HQ6iqqomm3Ay9TlI-Ql_J-KQHWH4",
+  authDomain: "admitto-7777c.firebaseapp.com",
+  projectId: "admitto-7777c",
+  storageBucket: "admitto-7777c.firebasestorage.app",
+  messagingSenderId: "642526916843",
+  appId: "1:642526916843:web:33c905add471a1a4e54eae",
+  measurementId: "G-VLNHJC0C6F"
 };
 
 const app = initializeApp(firebaseConfig);

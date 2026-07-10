@@ -1,6 +1,18 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { auth } from '../lib/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 export default function Navbar() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setIsAuthenticated(!!user);
+    });
+    return () => unsubscribe();
+  }, []);
+
   return (
     <nav className="w-full fixed top-0 left-0 bg-white/95 backdrop-blur-md z-50 border-b border-gray-100">
       <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
@@ -19,9 +31,9 @@ export default function Navbar() {
         </div>
 
         <div className="flex items-center gap-4">
-          <a href="/signup" className="bg-brand-red hover:bg-red-500 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-colors shadow-sm whitespace-nowrap">
+          <Link to={isAuthenticated ? "/step1" : "/signup"} className="bg-brand-red hover:bg-red-500 text-white px-4 py-2 md:px-6 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-colors shadow-sm whitespace-nowrap">
             Get started
-          </a>
+          </Link>
         </div>
       </div>
     </nav>
