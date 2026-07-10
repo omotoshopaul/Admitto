@@ -82,8 +82,8 @@ export default function Step4() {
           
           <button 
             type="button" 
-            disabled={true}
-            // TODO: enable and wire to /results once the Results page is built
+            onClick={() => isComplete && navigate('/results')}
+            // TEMPORARY: re-disable this once Results page testing is done, per product owner request.
             className={`flex-1 font-medium py-3.5 rounded-xl flex justify-center items-center h-[52px] transition-colors
               ${isComplete 
                 ? 'bg-[#E24B4A] text-white opacity-100' 
