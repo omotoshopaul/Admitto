@@ -28,7 +28,7 @@ export default function Step4() {
         <div className="mb-6 flex justify-center">
           <button onClick={() => navigate('/')} className="hover:opacity-80 transition-opacity">
             <img 
-              src="/Admitto_Transparent.png" 
+              src="Admitto_Transparent.png" 
               alt="Admitto logo" 
               className="h-[33px] w-auto object-contain"
             />
