@@ -95,9 +95,8 @@ export default function Purchase() {
         });
       },
       onClose: function() {
-        setError('Payment window closed.');
-        setIsPurchasing(false);
-      }
+  setIsPurchasing(false);
+}
     });
     handler.openIframe();
   };
