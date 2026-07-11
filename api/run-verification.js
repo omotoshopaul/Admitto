@@ -8,13 +8,14 @@ if (!getApps().length) {
 const db = getFirestore();
 
 async function runOcr(imageUrl) {
-  const response = await fetch('https://api.ocr.space/parse/imageurl', {
-    method: 'POST',
-    headers: {
-      'apikey': process.env.OCRSPACE_API_KEY,
-      'Content-Type': 'application/x-www-form-urlencoded'
-    },
-    body: `url=${encodeURIComponent(imageUrl)}&language=eng&OCREngine=2`
+  const params = new URLSearchParams({
+    apikey: process.env.OCRSPACE_API_KEY,
+    url: imageUrl,
+    language: 'eng',
+    OCREngine: '2'
+  });
+  const response = await fetch(`https://api.ocr.space/parse/imageurl?${params.toString()}`, {
+    method: 'GET'
   });
   const data = await response.json();
   if (data.OCRExitCode !== 1 || !data.ParsedResults || data.ParsedResults.length === 0) {
