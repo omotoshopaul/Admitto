@@ -113,7 +113,7 @@ export default function Purchase() {
         <div className="flex justify-between items-start mb-8">
           <button onClick={() => navigate('/')} className="hover:opacity-80 transition-opacity">
             <img 
-              src="/Admitto_Transparent.png" 
+              src="Admitto_Logo.png" 
               alt="Admitto logo" 
               className="h-[33px] w-auto object-contain"
             />
