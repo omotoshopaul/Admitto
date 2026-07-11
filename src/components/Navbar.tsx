@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../lib/firebase';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 
 export default function Navbar() {
+  const navigate = useNavigate();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
@@ -44,7 +45,7 @@ export default function Navbar() {
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-gray-600">
           <a href="#how-it-works" className="hover:text-brand-red transition-colors">How it works</a>
           <a href="#faqs" className="hover:text-brand-red transition-colors">FAQs</a>
-          <a href="#team" className="hover:text-brand-red transition-colors">Team</a>
+          <button onClick={() => navigate(isAuthenticated ? '/purchase' : '/login?redirect=/purchase')} className="hover:text-brand-red transition-colors">Purchase</button>
         </div>
 
         {/* Desktop Actions */}

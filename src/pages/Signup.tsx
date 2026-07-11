@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth, createUserWithEmailAndPassword, updateProfile, sendEmailVerification } from '../lib/firebase';
 import { FirebaseError } from 'firebase/app';
+import { signOut } from 'firebase/auth';
 
 export default function Signup() {
   const navigate = useNavigate();
@@ -66,10 +67,11 @@ export default function Signup() {
         displayName: `${firstName.trim()} ${lastName.trim()}`
       });
       const actionCodeSettings = {
-        url: `${window.location.origin}/step1`
+        url: `${window.location.origin}/login?verified=true&email=${encodeURIComponent(email)}`
       };
       await sendEmailVerification(userCredential.user, actionCodeSettings);
-      navigate('/step1');
+      await signOut(auth);
+      navigate('/?justSignedUp=true');
     } catch (error) {
       if (error instanceof FirebaseError) {
         switch (error.code) {

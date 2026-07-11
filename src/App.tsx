@@ -9,6 +9,8 @@ import Step3 from './pages/Step3';
 import Step4 from './pages/Step4';
 import Results from './pages/Results';
 import Verify from './pages/Verify';
+import Purchase from './pages/Purchase';
+import MyPurchases from './pages/MyPurchases';
 import ProtectedRoute from './components/ProtectedRoute';
 
 export default function App() {
@@ -24,6 +26,8 @@ export default function App() {
         <Route path="/step4" element={<ProtectedRoute><Step4 /></ProtectedRoute>} />
         <Route path="/results" element={<ProtectedRoute><Results /></ProtectedRoute>} />
         <Route path="/verify/:token" element={<Verify />} />
+        <Route path="/purchase" element={<ProtectedRoute><Purchase /></ProtectedRoute>} />
+        <Route path="/my-purchases" element={<ProtectedRoute><MyPurchases /></ProtectedRoute>} />
       </Routes>
     </Router>
   );

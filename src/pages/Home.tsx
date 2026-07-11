@@ -8,11 +8,22 @@ import Team from '../components/Team';
 import Footer from '../components/Footer';
 import { auth, sendEmailVerification } from '../lib/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
+import { useSearchParams, useNavigate } from 'react-router-dom';
 
 export default function Home() {
   const [user, setUser] = useState<User | null>(null);
   const [showVerificationBanner, setShowVerificationBanner] = useState(false);
   const [sendingVerification, setSendingVerification] = useState(false);
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const [showJustSignedUpBanner, setShowJustSignedUpBanner] = useState(false);
+
+  useEffect(() => {
+    if (searchParams.get('justSignedUp') === 'true') {
+      setShowJustSignedUpBanner(true);
+      navigate('/', { replace: true });
+    }
+  }, [searchParams, navigate]);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
@@ -41,6 +52,19 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-white">
+      {showJustSignedUpBanner && (
+        <div className="w-full bg-green-600 text-white text-sm py-3 px-6 flex items-center justify-between z-[60] relative">
+          <div className="flex-1 text-center font-medium">
+            Account created! Please check your email to verify your address before logging in.
+          </div>
+          <button 
+            onClick={() => setShowJustSignedUpBanner(false)}
+            className="text-white hover:text-white/80 transition-colors ml-4"
+          >
+            <i className="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+      )}
       {showVerificationBanner && (
         <div className="w-full bg-[#E24B4A] text-white text-sm py-3 px-6 flex items-center justify-between z-[60] relative">
           <div className="flex-1 text-center font-medium">

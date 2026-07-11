@@ -301,6 +301,17 @@ export default function Step1() {
     <div className="min-h-screen bg-gray-50 font-['Lexend',sans-serif] py-12 px-4 sm:px-6">
       <div className="max-w-2xl mx-auto bg-white rounded-2xl shadow-[0_4px_24px_rgba(0,0,0,0.04)] p-8 md:p-10 border border-gray-100">
         
+        {/* Logo Navigation */}
+        <div className="mb-6 flex justify-center">
+          <button onClick={() => navigate('/')} className="hover:opacity-80 transition-opacity">
+            <img 
+              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiPjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIGZpbGw9IiNlN2U1ZTQiLz48L3N2Zz4=" 
+              alt="Admitto logo" 
+              className="w-[100px] h-[33px] bg-gray-100 rounded object-cover"
+            />
+          </button>
+        </div>
+
         {/* Progress Bar */}
         <div className="flex items-center gap-2 mb-8">
           <div className="h-2 flex-1 rounded-full border transition-colors border-[#E24B4A] bg-[#E24B4A]"></div>

@@ -33,6 +33,10 @@ const faqs = [
   {
     question: "How do I get in touch with Admitto?",
     answer: "You can reach us by email at admittoverification@gmail.com or via WhatsApp at +2348109673729."
+  },
+  {
+    question: "What other services do we offer?",
+    answer: "You can purchase your WAEC and NECO scratch cards through the Purchase section in the Admitto app."
   }
 ];
 

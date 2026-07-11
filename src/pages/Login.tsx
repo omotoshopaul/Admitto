@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { auth, signInWithEmailAndPassword, sendPasswordResetEmail } from '../lib/firebase';
 import { FirebaseError } from 'firebase/app';
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const [showVerifiedBanner, setShowVerifiedBanner] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState('');
+
+  useEffect(() => {
+    if (searchParams.get('verified') === 'true') {
+      setShowVerifiedBanner(true);
+      const prefilledEmail = searchParams.get('email');
+      if (prefilledEmail) {
+        setEmail(prefilledEmail);
+      }
+      navigate('/login', { replace: true });
+    }
+  }, [searchParams, navigate]);
   const [password, setPassword] = useState('');
   
   const [emailError, setEmailError] = useState('');
@@ -53,7 +66,8 @@ export default function Login() {
     setIsLoading(true);
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      navigate('/step1');
+      const redirectTo = searchParams.get('redirect') || '/step1';
+      navigate(redirectTo);
     } catch (error) {
       if (error instanceof FirebaseError) {
         switch (error.code) {
@@ -116,6 +130,12 @@ export default function Login() {
         {/* Form Container */}
         <div className="flex-1 flex flex-col justify-center max-w-md w-full mx-auto">
           <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center md:text-left">Login</h1>
+          
+          {showVerifiedBanner && (
+            <div className="mb-6 p-4 bg-green-50 border border-green-200 text-green-700 rounded-xl text-sm font-medium">
+              Your email has been verified! Please log in to continue.
+            </div>
+          )}
 
           <div className="group border border-[rgba(226,75,74,0.7)] focus-within:border-[rgba(226,75,74,1)] rounded-2xl p-6 md:p-8 shadow-[0_4px_24px_rgba(0,0,0,0.04)] transition-all duration-300">
             <form className="flex flex-col gap-5" onSubmit={handleLogin}>
