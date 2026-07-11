@@ -1,4 +1,3 @@
-import vision from '@google-cloud/vision';
 import stringSimilarity from 'string-similarity';
 import { initializeApp, cert, getApps } from 'firebase-admin/app';
 import { getFirestore } from 'firebase-admin/firestore';
@@ -7,9 +6,22 @@ if (!getApps().length) {
   initializeApp({ credential: cert(JSON.parse(process.env.FIREBASE_ADMIN_SERVICE_ACCOUNT)) });
 }
 const db = getFirestore();
-const visionClient = new vision.ImageAnnotatorClient({
-  credentials: JSON.parse(process.env.GOOGLE_VISION_CREDENTIALS)
-});
+
+async function runOcr(imageUrl) {
+  const response = await fetch('https://api.ocr.space/parse/imageurl', {
+    method: 'POST',
+    headers: {
+      'apikey': process.env.OCRSPACE_API_KEY,
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    body: `url=${encodeURIComponent(imageUrl)}&language=eng&OCREngine=2`
+  });
+  const data = await response.json();
+  if (data.OCRExitCode !== 1 || !data.ParsedResults || data.ParsedResults.length === 0) {
+    return '';
+  }
+  return data.ParsedResults[0].ParsedText || '';
+}
 
 const FIELD_MAP = {
   'JAMB': ['firstName', 'lastName', 'dateOfBirth'],
@@ -60,8 +72,7 @@ export default async function handler(req, res) {
     if (userData.verificationType === 'mismatch') {
       const updatedDocs = [];
       for (const doc of userData.mismatchDocuments || []) {
-        const [visionResult] = await visionClient.textDetection(doc.url);
-        const extractedText = visionResult.textAnnotations.length > 0 ? visionResult.textAnnotations[0].description : '';
+        const extractedText = await runOcr(doc.url);
 
         const fieldsToCheck = FIELD_MAP[doc.type] || FIELD_MAP['Other'];
         const fieldResults = [];
@@ -89,8 +100,7 @@ export default async function handler(req, res) {
     } else if (userData.verificationType === 'grammar') {
       const updatedDocs = [];
       for (const doc of userData.testimonialDocuments || []) {
-        const [visionResult] = await visionClient.textDetection(doc.url || doc);
-        const extractedText = visionResult.textAnnotations.length > 0 ? visionResult.textAnnotations[0].description : '';
+        const extractedText = await runOcr(doc.url || doc);
 
         const grammarResponse = await fetch('https://api.languagetool.org/v2/check', {
           method: 'POST',
