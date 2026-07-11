@@ -282,9 +282,9 @@ export default function Step3() {
         <div className="mb-6 flex justify-center">
           <button onClick={() => navigate('/')} className="hover:opacity-80 transition-opacity">
             <img 
-              src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiPjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIGZpbGw9IiNlN2U1ZTQiLz48L3N2Zz4=" 
+              src="/Admitto_Transparent.png" 
               alt="Admitto logo" 
-              className="w-[100px] h-[33px] bg-gray-100 rounded object-cover"
+              className="h-[33px] w-auto object-contain"
             />
           </button>
         </div>
