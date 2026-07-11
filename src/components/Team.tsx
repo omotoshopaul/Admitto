@@ -1,10 +1,10 @@
 import React from 'react';
 
 const team = [
-  { name: "Shafe Emmanuella", role: "Data Analyst" },
-  { name: "Chidinma Nworie", role: "Data Analyst" },
-  { name: "Akinsola Peniel", role: "Back-End Engineer" },
-  { name: "Omotosho Paul", role: "Front-End Engineer" }
+  { name: "Shafe Emmanuella", role: "Data Analyst", image: "/Mimi.png" },
+  { name: "Chidinma Nworie", role: "Data Analyst", image: "/Chidimma.png" },
+  { name: "Akinsola Peniel", role: "Back-End Engineer", image: "/Peniel.png" },
+  { name: "Omotosho Paul", role: "Front-End Engineer", image: "/Paul.png" },
 ];
 
 export default function Team() {
@@ -18,17 +18,19 @@ export default function Team() {
       </div>
 
       <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-4 mb-20">
-        {team.map((member, index) => (
-          <div key={index} className="flex flex-col items-center text-center">
-            <div 
-              className="w-32 h-32 md:w-40 md:h-40 rounded-full bg-[#D9D9D9] mb-6"
-              style={{ border: '2px solid rgba(226, 75, 74, 0.7)' }}
-            ></div>
-            <h3 className="font-bold text-gray-900 text-lg mb-1">{member.name}</h3>
-            <p className="text-sm text-gray-500">{member.role}</p>
-          </div>
-        ))}
-      </div>
+  {team.map((member, index) => (
+    <div key={index} className="flex flex-col items-center text-center">
+      <img
+        src={member.image}
+        alt={member.name}
+        className="w-32 h-32 md:w-40 md:h-40 rounded-full object-cover mb-6"
+        style={{ border: '2px solid rgba(226, 75, 74, 0.7)' }}
+      />
+      <h3 className="font-bold text-gray-900 text-lg mb-1">{member.name}</h3>
+      <p className="text-sm text-gray-500">{member.role}</p>
+    </div>
+  ))}
+</div>
 
       <div className="max-w-[700px] mx-auto text-center">
         <p className="text-xl md:text-2xl text-black font-medium leading-relaxed">
