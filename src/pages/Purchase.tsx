@@ -47,14 +47,21 @@ export default function Purchase() {
 
   const totalAmount = selectedCard ? selectedCard.unit_amount * quantity : 0;
 
-  const handlePurchase = () => {
-    if (!selectedCard || !auth.currentUser) return;
-    setIsPurchasing(true);
-    setError('');
+ const handlePurchase = () => {
+  if (!selectedCard || !auth.currentUser) return;
+  
+  const paystackKey = (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY;
+  if (!paystackKey) {
+    setError('Payment configuration error. Please contact support.');
+    return;
+  }
+  
+  setIsPurchasing(true);
+  setError('');
 
     // @ts-ignore
     const handler = (window as any).PaystackPop.setup({
-      key: (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder', // Should be replaced with actual key in env
+     key: (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY,
       email: auth.currentUser.email,
       amount: totalAmount * 100, // convert Naira to kobo
       currency: 'NGN',
