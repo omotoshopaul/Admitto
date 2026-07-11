@@ -17,7 +17,8 @@ export default function Step4() {
     return () => unsubscribe();
   }, []);
 
-  const isComplete = verificationStatus === "complete";
+  const isComplete = verificationStatus === "complete" || verificationStatus === "completed";
+  const isError = verificationStatus === "error";
 
   return (
     <div className="min-h-screen bg-gray-50 font-['Lexend',sans-serif] py-12 px-4 sm:px-6">
@@ -39,12 +40,12 @@ export default function Step4() {
           <div className="h-2 flex-1 rounded-full border transition-colors border-[#E24B4A] bg-[#E24B4A]"></div>
           <div className="h-2 flex-1 rounded-full border transition-colors border-[#E24B4A] bg-[#E24B4A]"></div>
           <div className="h-2 flex-1 rounded-full border transition-colors border-[#E24B4A] bg-[#E24B4A]"></div>
-          <div className={`h-2 flex-1 rounded-full border transition-colors ${isComplete ? 'border-[#E24B4A] bg-[#E24B4A]' : 'border-gray-200 bg-white'}`}></div>
+          <div className={`h-2 flex-1 rounded-full border transition-colors ${(isComplete || isError) ? 'border-[#E24B4A] bg-[#E24B4A]' : 'border-gray-200 bg-white'}`}></div>
         </div>
 
         <div className="mb-10">
           <h2 className="text-2xl font-bold text-gray-900 mb-4">
-            {isComplete ? "Document verification done" : "Document Verification ongoing"}
+            {isError ? "Verification Failed" : (isComplete ? "Document verification done" : "Document Verification ongoing")}
           </h2>
         </div>
 
@@ -56,7 +57,11 @@ export default function Step4() {
           <div className="absolute bottom-0 left-0 w-8 h-8 border-b-4 border-l-4 border-gray-300"></div>
           <div className="absolute bottom-0 right-0 w-8 h-8 border-b-4 border-r-4 border-gray-300"></div>
 
-          {isComplete ? (
+          {isError ? (
+            <div className="w-20 h-20 rounded-full border-4 border-red-500 flex items-center justify-center bg-white text-red-500">
+              <i className="fa-solid fa-xmark text-4xl"></i>
+            </div>
+          ) : isComplete ? (
             <div className="w-20 h-20 rounded-full border-4 border-[#E24B4A] flex items-center justify-center bg-white text-[#E24B4A]">
               <i className="fa-solid fa-check text-4xl"></i>
             </div>
@@ -72,18 +77,20 @@ export default function Step4() {
           }
         `}</style>
 
-        <p className="text-sm text-gray-500 mb-10">
-          {isComplete ? "Check your document verification result" : "Admitto AI is verifying your documents"}
+        <p className="text-sm mb-10 text-gray-500">
+          {isError ? (
+            <span className="text-red-500 font-medium">An error occurred during verification. Please go back and try again.</span>
+          ) : isComplete ? "Check your document verification result" : "Admitto AI is verifying your documents"}
         </p>
 
         {/* Navigation Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 border-t border-gray-100 pt-8 mt-8">
           <button 
             type="button"
-            onClick={() => isComplete && navigate('/step3')}
-            disabled={!isComplete}
+            onClick={() => (isComplete || isError) && navigate('/step3')}
+            disabled={!isComplete && !isError}
             className={`flex-1 font-medium py-3.5 rounded-xl transition-colors h-[52px]
-              ${isComplete 
+              ${(isComplete || isError)
                 ? 'bg-white border border-[#E24B4A] text-[#E24B4A] hover:bg-red-50' 
                 : 'bg-gray-100 text-gray-400 opacity-60 cursor-not-allowed'}
             `}

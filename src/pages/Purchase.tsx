@@ -45,25 +45,16 @@ export default function Purchase() {
   const incrementQuantity = () => setQuantity(prev => (prev < 100 ? prev + 1 : prev));
   const decrementQuantity = () => setQuantity(prev => (prev > 1 ? prev - 1 : prev));
 
-  const PROFIT_MARGIN = 500; // your profit per card, in Naira
-  const sellingPricePerCard = selectedCard ? selectedCard.unit_amount + PROFIT_MARGIN : 0;
-  const totalAmount = sellingPricePerCard * quantity;
+  const totalAmount = selectedCard ? selectedCard.unit_amount * quantity : 0;
 
- const handlePurchase = () => {
-  if (!selectedCard || !auth.currentUser) return;
-  
-  const paystackKey = (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY;
-  if (!paystackKey) {
-    setError('Payment configuration error. Please contact support.');
-    return;
-  }
-  
-  setIsPurchasing(true);
-  setError('');
+  const handlePurchase = () => {
+    if (!selectedCard || !auth.currentUser) return;
+    setIsPurchasing(true);
+    setError('');
 
     // @ts-ignore
     const handler = (window as any).PaystackPop.setup({
-     key: (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY,
+      key: (import.meta as any).env.VITE_PAYSTACK_PUBLIC_KEY || 'pk_test_placeholder', // Should be replaced with actual key in env
       email: auth.currentUser.email,
       amount: totalAmount * 100, // convert Naira to kobo
       currency: 'NGN',
@@ -95,8 +86,9 @@ export default function Purchase() {
         });
       },
       onClose: function() {
-  setIsPurchasing(false);
-}
+        setError('Payment window closed.');
+        setIsPurchasing(false);
+      }
     });
     handler.openIframe();
   };
@@ -236,7 +228,7 @@ export default function Purchase() {
             {/* Price Display */}
             {selectedCard && (
               <div className="bg-gray-50 rounded-xl p-6 text-center border border-gray-100">
-                <p className="text-gray-500 mb-2">Price per card: <span className="font-medium text-gray-900">₦{sellingPricePerCard.toLocaleString()}</span></p>
+                <p className="text-gray-500 mb-2">Price per card: <span className="font-medium text-gray-900">₦{selectedCard.unit_amount.toLocaleString()}</span></p>
                 <p className="text-2xl font-bold text-[#E24B4A]">Total: ₦{totalAmount.toLocaleString()}</p>
               </div>
             )}

@@ -7,7 +7,8 @@ export default function Step3() {
   const navigate = useNavigate();
   const [verificationType, setVerificationType] = useState<'mismatch' | 'grammar' | null>(null);
   
-  const [mismatchDocuments, setMismatchDocuments] = useState<(string | null)[]>(Array(6).fill(null));
+  const [mismatchDocuments, setMismatchDocuments] = useState<({ url: string, type: string } | null)[]>(Array(6).fill(null));
+  const [mismatchDocTypes, setMismatchDocTypes] = useState<string[]>(Array(6).fill('')); // Temporary state for select dropdown
   const [testimonialDocuments, setTestimonialDocuments] = useState<(string | null)[]>(Array(2).fill(null));
   
   const [isUploading, setIsUploading] = useState<{ type: 'mismatch' | 'grammar', index: number } | null>(null);
@@ -36,6 +37,10 @@ export default function Step3() {
               const loaded = [...data.mismatchDocuments];
               while (loaded.length < 6) loaded.push(null);
               setMismatchDocuments(loaded.slice(0, 6));
+              
+              const types = loaded.map(d => d ? d.type : '');
+              while (types.length < 6) types.push('');
+              setMismatchDocTypes(types.slice(0, 6));
             }
             if (data.testimonialDocuments) {
               const loaded = [...data.testimonialDocuments];
@@ -70,6 +75,8 @@ export default function Step3() {
 
   const triggerUpload = (type: 'mismatch' | 'grammar', index: number) => {
     if (isUploading) return;
+    if (type === 'mismatch' && !mismatchDocTypes[index]) return; // Disable if no type selected
+    
     setActiveUploadSlot({ type, index });
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -84,6 +91,10 @@ export default function Step3() {
       newDocs[index] = null;
       setMismatchDocuments(newDocs);
       autoSave({ mismatchDocuments: newDocs.filter(d => d !== null) });
+      
+      const newTypes = [...mismatchDocTypes];
+      newTypes[index] = '';
+      setMismatchDocTypes(newTypes);
     } else {
       const newDocs = [...testimonialDocuments];
       newDocs[index] = null;
@@ -137,7 +148,7 @@ export default function Step3() {
       if (data.secure_url) {
         if (type === 'mismatch') {
           const newDocs = [...mismatchDocuments];
-          newDocs[index] = data.secure_url;
+          newDocs[index] = { url: data.secure_url, type: mismatchDocTypes[index] };
           setMismatchDocuments(newDocs);
           autoSave({ mismatchDocuments: newDocs.filter(d => d !== null) });
         } else {
@@ -175,6 +186,14 @@ export default function Step3() {
 
     try {
       await autoSave({ verificationStatus: "processing" });
+      
+      // Trigger backend verification
+      fetch('/api/run-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ uid: auth.currentUser.uid })
+      });
+      
       navigate('/step4');
     } catch (error) {
       console.error("Error saving data:", error);
@@ -182,8 +201,14 @@ export default function Step3() {
     }
   };
 
+  const handleDocTypeChange = (index: number, value: string) => {
+    const newTypes = [...mismatchDocTypes];
+    newTypes[index] = value;
+    setMismatchDocTypes(newTypes);
+  };
+
   const renderUploadBox = (type: 'mismatch' | 'grammar', index: number) => {
-    const fileUrl = type === 'mismatch' ? mismatchDocuments[index] : testimonialDocuments[index];
+    const fileUrl = type === 'mismatch' ? mismatchDocuments[index]?.url : testimonialDocuments[index];
     const isLoading = isUploading?.type === type && isUploading?.index === index;
     const error = uploadErrors[`${type}-${index}`];
     
@@ -192,10 +217,30 @@ export default function Step3() {
 
     return (
       <div key={`${type}-${index}`} className="flex flex-col gap-2">
+        {type === 'mismatch' && !fileUrl && (
+          <select 
+            value={mismatchDocTypes[index]} 
+            onChange={(e) => handleDocTypeChange(index, e.target.value)}
+            className="w-full text-xs p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-[#E24B4A]"
+          >
+            <option value="" disabled>Select Type</option>
+            <option value="JAMB">JAMB</option>
+            <option value="WAEC/NECO">WAEC/NECO</option>
+            <option value="Birth Certificate">Birth Certificate</option>
+            <option value="Testimonial">Testimonial</option>
+            <option value="Other">Other</option>
+          </select>
+        )}
+        {type === 'mismatch' && fileUrl && (
+          <div className="text-center font-medium text-xs text-gray-700 bg-gray-100 py-1 px-2 rounded-md truncate">
+            {mismatchDocuments[index]?.type}
+          </div>
+        )}
+        
         <div 
           onClick={() => !fileUrl && triggerUpload(type, index)}
           className={`relative aspect-square w-full max-w-[150px] mx-auto sm:max-w-none rounded-xl border-2 flex flex-col items-center justify-center transition-colors overflow-hidden group
-            ${fileUrl ? 'border-[#E24B4A]' : 'border-dashed border-gray-300 hover:border-[#E24B4A] hover:bg-gray-50 cursor-pointer'}
+            ${fileUrl ? 'border-[#E24B4A]' : (type === 'mismatch' && !mismatchDocTypes[index]) ? 'border-dashed border-gray-200 bg-gray-50 cursor-not-allowed opacity-50' : 'border-dashed border-gray-300 hover:border-[#E24B4A] hover:bg-gray-50 cursor-pointer'}
           `}
         >
           {isLoading ? (
@@ -311,7 +356,7 @@ export default function Step3() {
               <>
                 <div className="mb-6">
                   <h3 className="font-semibold text-gray-900 mb-1">Upload your documents</h3>
-                  <p className="text-sm text-gray-600">Upload up to 6 documents. You don't need to upload all 6 at once.</p>
+                  <p className="text-sm text-gray-600">Upload up to 6 documents. Select the document type before uploading.</p>
                 </div>
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                   {mismatchDocuments.map((_, i) => renderUploadBox('mismatch', i))}
@@ -348,7 +393,8 @@ export default function Step3() {
           <button 
             type="button" 
             onClick={handleNext}
-            className="flex-1 bg-[#E24B4A] hover:bg-red-500 text-white font-medium py-3.5 rounded-xl flex justify-center items-center h-[52px] transition-colors"
+            disabled={!isNextEnabled}
+            className="flex-1 bg-[#E24B4A] hover:bg-red-500 text-white font-medium py-3.5 rounded-xl flex justify-center items-center h-[52px] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
           </button>

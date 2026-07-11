@@ -6,6 +6,7 @@ import { QRCodeCanvas } from 'qrcode.react';
 
 interface DocData {
   url?: string;
+  type?: string;
   status?: 'pending' | 'verified' | 'unverified';
   matchedValue?: string;
   expectedValue?: string;
@@ -39,7 +40,7 @@ export default function Results() {
           // Filter out nulls and normalize
           const normalizedDocs: DocData[] = docsArray
             .filter(d => d !== null)
-            .map(d => (typeof d === 'string' ? { url: d, status: 'pending' } : d));
+            .map(d => (typeof d === 'string' ? { url: d, status: 'pending' } : { ...d, status: d.status || 'pending' }));
           
           setDocumentsList(normalizedDocs);
 
@@ -51,7 +52,7 @@ export default function Results() {
           const summary = {
             studentName: `${firstName} ${lastName}`.trim() || 'Student',
             documents: normalizedDocs.map((doc, i) => ({
-              label: `Doc ${i + 1}`,
+              label: doc.type || `Doc ${i + 1}`,
               status: doc.status || 'pending',
               matchedValue: doc.matchedValue || null,
               expectedValue: doc.expectedValue || null,
@@ -125,6 +126,8 @@ export default function Results() {
               if (doc.status === 'verified') statusText = "Verified";
               if (doc.status === 'unverified') statusText = "Unverified";
 
+              const rowLabel = doc.type || `Doc ${i + 1}`;
+
               return (
                 <div key={i} className="flex flex-col rounded-xl overflow-hidden shadow-sm">
                   {/* Row Header */}
@@ -132,7 +135,7 @@ export default function Results() {
                     onClick={() => toggleRow(i)}
                     className="bg-[#E24B4A] text-white px-6 py-4 flex justify-between items-center cursor-pointer hover:bg-red-500 transition-colors"
                   >
-                    <span className="font-semibold">Doc {i + 1}</span>
+                    <span className="font-semibold">{rowLabel}</span>
                     <div className="flex items-center gap-4">
                       <span className="text-sm font-medium">{statusText}</span>
                       <i className={`fa-solid ${isExpanded ? 'fa-minus' : 'fa-plus'} w-4 text-center`}></i>
