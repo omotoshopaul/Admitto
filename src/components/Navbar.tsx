@@ -36,9 +36,9 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center relative" ref={menuRef}>
         <a href="#" className="flex-shrink-0 transition-opacity hover:opacity-90">
           <img 
-            src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiPjxyZWN0IHdpZHRoPSIxMjAiIGhlaWdodD0iNDAiIGZpbGw9IiNlN2U1ZTQiLz48L3N2Zz4=" 
+            src="/Admitto_Transparent.png" 
             alt="Admitto logo"
-            className="w-[120px] h-[40px] bg-gray-100 rounded object-cover"
+            className="h-[40px] w-auto object-contain"
           />
         </a>
         
